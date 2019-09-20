@@ -42,7 +42,8 @@ func (f *firestoreAttendanceRepo) Update(ctx context.Context, path string, atten
 	return
 }
 
-func (f *firestoreAttendanceRepo) GetCount(ctx context.Context, path string) (count domain.Count, err error) {
+func (f *firestoreAttendanceRepo) GetCount(ctx context.Context, id string) (count domain.Count, err error) {
+	path := fmt.Sprintf("%s/%s", f.collection, id)
 	doc, err := f.client.Doc(path).Get(ctx)
 
 	if err != nil {
