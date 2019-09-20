@@ -2,6 +2,7 @@ package firestore
 
 import (
 	"context"
+	"fmt"
 
 	gFirestore "cloud.google.com/go/firestore"
 	"github.com/jfussion/ignite-attendance-cloud-functions/domain"
@@ -10,16 +11,29 @@ import (
 )
 
 type firestoreAttendanceRepo struct {
-	client *gFirestore.Client
+	client     *gFirestore.Client
+	collection string
 }
 
-func NewFirestoreAttendanceRepo(c *gFirestore.Client) domain.AttendanceRepository {
-	return &firestoreAttendanceRepo{client: c}
+func NewFirestoreAttendanceRepo(c *gFirestore.Client, col string) domain.AttendanceRepository {
+	return &firestoreAttendanceRepo{
+		client:     c,
+		collection: col,
+	}
 }
-func (f *firestoreAttendanceRepo) Add(ctx context.Context, attendance domain.Attendance) (err error) {
-	return
+
+func CountToMap(count domain.Count) map[string]interface{} {
+	return map[string]interface{}{
+		"total":   count.Total,
+		"members": count.Members,
+		"vips":    count.VIPs,
+	}
 }
-func (f *firestoreAttendanceRepo) UpdateCount(ctx context.Context, path string, count domain.Count) (err error) {
+
+func (f *firestoreAttendanceRepo) UpdateCount(ctx context.Context, id string, count domain.Count) (err error) {
+	data := CountToMap(count)
+	path := fmt.Sprintf("%s/%s", f.collection, id)
+	_, err = f.client.Doc(path).Set(ctx, data)
 	return
 }
 
@@ -40,5 +54,10 @@ func (f *firestoreAttendanceRepo) GetCount(ctx context.Context, path string) (co
 	}
 
 	count = ToCount(doc.Data())
+	return
+}
+
+func (f *firestoreAttendanceRepo) Add(ctx context.Context, attendance domain.Attendance) (err error) {
+	// TODO: remove Add method to interface
 	return
 }
