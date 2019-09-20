@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"cloud.google.com/go/firestore"
 )
 
 // FirestoreEvent is the payload of a Firestore event.
@@ -53,19 +51,6 @@ type AttendanceData struct {
 	IsMember struct {
 		Value bool `json:"BooleanValue"`
 	} `json:"isMember"`
-}
-
-type ClientRepo interface {
-	Doc(path string) *firestore.DocumentRef
-}
-
-type DocSnapshot interface {
-	Data() map[string]interface{}
-}
-
-type GetterSetter interface {
-	Get(ctx context.Context) (doc *firestore.DocumentSnapshot, err error)
-	Set(ctx context.Context, data interface{}, opts ...firestore.SetOption) (_ *firestore.WriteResult, err error)
 }
 
 func GetPeople(ctx context.Context, id string) (people People, err error) {
