@@ -12,11 +12,18 @@ import (
 
 type firestorePeopleRepo struct {
 	client     *gFirestore.Client
-	Collection string
+	collection string
+}
+
+func NewFirestorePeopleRepo(c *gFirestore.Client, col string) *firestorePeopleRepo {
+	return &firestorePeopleRepo{
+		client:     c,
+		collection: col,
+	}
 }
 
 func (f *firestorePeopleRepo) Get(ctx context.Context, id string) (people domain.People, err error) {
-	doc, err := f.client.Collection(f.Collection).Doc(id).Get()
+	doc, err := f.client.Collection(f.collection).Doc(id).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			log.Printf("error: document %s not found", id)
@@ -27,7 +34,7 @@ func (f *firestorePeopleRepo) Get(ctx context.Context, id string) (people domain
 
 	data := doc.Data()
 	data["id"] = id
-	people := ToPeople(data)
+	people = ToPeople(data)
 	return
 }
 
