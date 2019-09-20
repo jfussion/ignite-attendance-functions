@@ -18,10 +18,11 @@ func TestGetPeople(t *testing.T) {
 	mockPeopleUcase := usecase.NewUsecase(mockPeopleRepo)
 
 	tPeople := domain.People{
-		ID:     "IGNT-DEMO-0001",
-		Name:   "Joe",
-		School: "PUP",
-		Course: "BSCpE",
+		ID:       "IGNT-DEMO-0001",
+		Name:     "Joe",
+		School:   "PUP",
+		Course:   "BSCpE",
+		IsMember: true,
 	}
 
 	id := "IGNT-DEMO-0001"
