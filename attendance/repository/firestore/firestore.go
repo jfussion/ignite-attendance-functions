@@ -9,24 +9,26 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type firestoreRepo struct {
+type firestoreAttendanceRepo struct {
 	client *gFirestore.Client
 }
 
-func NewFirestoreRepo(c *gFirestore.Client) domain.AttendanceRepository {
-	return &firestoreRepo{client: c}
+func NewFirestoreAttendanceRepo(c *gFirestore.Client) domain.AttendanceRepository {
+	return &firestoreAttendanceRepo{client: c}
 }
-func (f *firestoreRepo) Add(ctx context.Context, attendance domain.Attendance) (err error) { return }
-func (f *firestoreRepo) UpdateCount(ctx context.Context, id string, count domain.Count) (err error) {
+func (f *firestoreAttendanceRepo) Add(ctx context.Context, attendance domain.Attendance) (err error) {
+	return
+}
+func (f *firestoreAttendanceRepo) UpdateCount(ctx context.Context, path string, count domain.Count) (err error) {
 	return
 }
 
-func (f *firestoreRepo) Update(ctx context.Context, path string, attendance domain.Attendance) (err error) {
+func (f *firestoreAttendanceRepo) Update(ctx context.Context, path string, attendance domain.Attendance) (err error) {
 	_, err = f.client.Doc(path).Set(ctx, ToMap(attendance))
 	return
 }
 
-func (f *firestoreRepo) GetCount(ctx context.Context, path string) (count domain.Count, err error) {
+func (f *firestoreAttendanceRepo) GetCount(ctx context.Context, path string) (count domain.Count, err error) {
 	doc, err := f.client.Doc(path).Get(ctx)
 
 	if err != nil {

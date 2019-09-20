@@ -44,6 +44,7 @@ func TestAddAttendance(t *testing.T) {
 		assert.Error(t, got)
 		mockAttendanceRepo.AssertExpectations(t)
 	})
+
 }
 
 func TestUpdateAttendance(t *testing.T) {
