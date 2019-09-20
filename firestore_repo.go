@@ -96,6 +96,7 @@ func PopulateAttendance(ctx context.Context, path string, val AttendanceData) {
 		log.Fatalf("error: %v", err)
 	}
 
+	addCount(ctx)
 	if val.Name.Value != "" {
 		log.Print("Skipping.. Attendance is already populated")
 		return
@@ -117,12 +118,17 @@ func PopulateAttendance(ctx context.Context, path string, val AttendanceData) {
 }
 
 func addCount(ctx context.Context) {
-	r, err := client.Doc("attendance/count").Get(ctx)
+	q := client.Doc("attendance/count")
+	r, err := q.Get(ctx)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
-	count := r.Data()
+	data := r.Data()
+	count := int(data["total"].(int64))
+	count++
+
+	q.Set(ctx, map[string]int{"total": count})
 }
 
 // func isDuplicate(ctx context.Context, collection, date, id string) bool {
