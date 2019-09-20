@@ -8,10 +8,14 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	firestoreAttendanceRepo "github.com/jfussion/ignite-attendance-cloud-functions/attendance/repository/firestore"
+	attendanceUsecase "github.com/jfussion/ignite-attendance-cloud-functions/attendance/usecase"
+	"github.com/jfussion/ignite-attendance-cloud-functions/domain"
+	firestorePeopleRepo "github.com/jfussion/ignite-attendance-cloud-functions/people/repository/firestore"
+	peopleUsecase "github.com/jfussion/ignite-attendance-cloud-functions/people/usecase"
 )
 
 const peopleCollection = "people"
-const attendanceCollection = "attendance-demo"
 
 var client *firestore.Client
 
@@ -35,10 +39,43 @@ func init() {
 	}
 }
 
-func F(ctx context.Context, e FirestoreEvent) error {
+func F(ctx context.Context, e FirestoreEvent) (err error) {
+	data := e.Value.Fields
 	path := extractPath(e.Value.Name)
-	PopulateAttendance(ctx, path, e.Value.Fields)
-	return nil
+	attendanceCollection := strings.Split(path, "/")[0]
+
+	attendanceRepo := firestoreAttendanceRepo.NewFirestoreAttendanceRepo(client, attendanceCollection)
+	peopleRepo := firestorePeopleRepo.NewFirestorePeopleRepo(client, peopleCollection)
+	peopleUcase := peopleUsecase.NewPeopleUsecase(peopleRepo)
+	attendanceUcase := attendanceUsecase.NewAttendanceUsecase(attendanceRepo)
+
+	people, err := peopleUcase.Get(ctx, data.ID.Value)
+	if err != nil {
+		log.Printf("something went wrong when getting people data: %v", err)
+		return
+	}
+
+	attendance := domain.Attendance{
+		Date:   data.Date.Value,
+		People: people,
+	}
+
+	if data.Name.Value != "" {
+		log.Print("info: skipping, attendance has already populated")
+	} else {
+		err = attendanceUcase.Update(ctx, path, attendance)
+		if err != nil {
+			log.Printf("something went updating attendance: %v", err)
+			return
+		}
+	}
+
+	err = attendanceUcase.IncrementCount(ctx, people.IsMember)
+	if err != nil {
+		log.Printf("something went updating attendance: %v", err)
+	}
+
+	return
 }
 
 func extractPath(path string) string {
