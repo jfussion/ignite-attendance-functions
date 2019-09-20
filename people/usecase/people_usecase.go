@@ -10,7 +10,7 @@ type peopleUsecase struct {
 	repo domain.PeopleRepository
 }
 
-func NewUsecase(peopleRepo domain.PeopleRepository) domain.PeopleUsecase {
+func NewPeopleUsecase(peopleRepo domain.PeopleRepository) domain.PeopleUsecase {
 	return &peopleUsecase{
 		repo: peopleRepo,
 	}

@@ -15,7 +15,7 @@ import (
 
 func TestGetPeople(t *testing.T) {
 	mockPeopleRepo := new(mocks.PeopleRepository)
-	mockPeopleUcase := usecase.NewUsecase(mockPeopleRepo)
+	mockPeopleUcase := usecase.NewPeopleUsecase(mockPeopleRepo)
 
 	tPeople := domain.People{
 		ID:       "IGNT-DEMO-0001",
